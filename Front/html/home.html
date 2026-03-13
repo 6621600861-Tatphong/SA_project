@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
 <meta charset="UTF-8">
 <title>Home</title>
@@ -7,13 +7,37 @@
 
 <body>
 
-<h2>Home</h2>
-
-<p id="welcome"></p>
+<h2>รายการหนังสือ</h2>
 
 <button onclick="logout()">Logout</button>
 
+<br><br>
+
+<table border="1">
+<thead>
+<tr>
+<th>ID</th>
+<th>ชื่อหนังสือ</th>
+<th>ประเภท</th>
+<th>สถานะ</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="bookTable"></tbody>
+
+</table>
+
 <script src="../js/home.js"></script>
+
+<script>
+
+function logout(){
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+}
+
+</script>
 
 </body>
 </html>
