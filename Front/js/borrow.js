@@ -7,13 +7,10 @@ const borrowDateInput = document.getElementById("borrow_date");
 const returnDateInput = document.getElementById("return_date");
 
 
-// =======================
-// โหลด user จาก localStorage
-// =======================
-
+// โหลด user
 const userData = localStorage.getItem("user");
 
-if(!userData){
+if (!userData) {
     alert("กรุณาเข้าสู่ระบบก่อน");
     window.location.href = "login.html";
 }
@@ -24,10 +21,7 @@ usernameInput.value = user.username;
 phoneInput.value = user.phone;
 
 
-// =======================
-// ตั้งค่าวันยืมและวันคืน
-// =======================
-
+// วันที่ปัจจุบัน
 const today = new Date();
 
 const borrow_date = today.toISOString().split("T")[0];
@@ -40,10 +34,8 @@ borrowDateInput.value = borrow_date;
 returnDateInput.value = return_date;
 
 
-// =======================
-// ยืมหนังสือ
-// =======================
 
+// ยืมหนังสือ
 document.getElementById("borrowForm").addEventListener("submit", async function(e){
 
     e.preventDefault();
@@ -60,18 +52,19 @@ document.getElementById("borrowForm").addEventListener("submit", async function(
 
             body:JSON.stringify({
                 username:user.username,
-                phone:user.phone,
-                borrow_date:borrow_date,
-                return_date:return_date
+                phone:user.phone
             })
 
         });
 
         const data = await res.json();
 
-        alert("ยืมหนังสือสำเร็จ");
-
-        window.location.href = "home.html";
+        if(res.ok){
+            alert("ยืมหนังสือสำเร็จ");
+            window.location.href = "home.html";
+        }else{
+            alert(data.message);
+        }
 
     }catch(error){
 
