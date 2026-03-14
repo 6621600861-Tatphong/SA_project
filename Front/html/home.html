@@ -13,6 +13,17 @@
 
 <br><br>
 
+<label>ชื่อหนังสือ</label>
+<input type="text" id="searchName" onkeyup="searchBooks()">
+
+<label>ประเภทหนังสือ</label>
+<input type="text" id="searchType" onkeyup="searchBooks()">
+
+<button onclick="searchBooks()">ค้นหา</button>
+<button onclick="resetSearch()">รีเซ็ต</button>
+
+<br><br>
+
 <table border="1">
 <thead>
 <tr>
@@ -25,7 +36,6 @@
 </thead>
 
 <tbody id="bookTable"></tbody>
-
 </table>
 
 <script src="../js/home.js"></script>
