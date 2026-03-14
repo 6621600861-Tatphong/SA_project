@@ -198,6 +198,69 @@ app.delete('/book/:id', async (req,res)=>{
 
 });
 
+// SEARCH book
+app.get('/book', async (req,res)=>{
+
+    try{
+
+        let book_name = req.query.book_name;
+        let book_type = req.query.book_type;
+
+        let sql = `
+        SELECT 
+            book.b_id,
+            book.book_name,
+            book.book_type,
+            book.book_detail,
+
+            CASE
+                WHEN borrow.status = 'ยังไม่คืน'
+                THEN 'ยืมไม่ได้'
+                ELSE 'ยืมได้'
+            END AS status,
+
+            user.username,
+            user.phone
+
+        FROM book
+
+        LEFT JOIN borrow
+        ON book.b_id = borrow.book_id
+        AND borrow.status = 'ยังไม่คืน'
+
+        LEFT JOIN user
+        ON borrow.user_id = user.id
+
+        WHERE 1=1
+        `;
+
+        let params = [];
+
+        if(book_name){
+            sql += ` AND book.book_name LIKE ?`;
+            params.push(`%${book_name}%`);
+        }
+
+        if(book_type){
+            sql += ` AND book.book_type LIKE ?`;
+            params.push(`%${book_type}%`);
+        }
+
+        const results = await conn.query(sql,params);
+
+        res.json(results[0]);
+
+    }catch(error){
+
+        console.log(error);
+
+        res.status(500).json({
+            message:"Error searching books"
+        });
+
+    }
+
+});
 //----------------------------------------------------------------------------------------------------------------
 
 
