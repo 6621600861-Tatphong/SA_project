@@ -8,44 +8,53 @@ const registerForm = document.getElementById("registerForm");
 
 if (loginForm) {
 
-loginForm.addEventListener("submit", async function(e){
+    loginForm.addEventListener("submit", async function (e) {
 
-e.preventDefault();
+        e.preventDefault();
 
-const username = document.getElementById("username").value;
-const password = document.getElementById("password").value;
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
 
-try{
+        try {
 
-const res = await fetch("http://localhost:8000/user");
-const users = await res.json();
+            const res = await fetch("http://localhost:8000/user");
+            const users = await res.json();
 
-const user = users.find(u => u.username === username && u.password === password);
+            const user = users.find(u => u.username === username && u.password === password);
 
-if(user){
+            if (user) {
 
-// เก็บข้อมูล user ทั้ง object
-localStorage.setItem("user", JSON.stringify({
-username: user.username,
-phone: user.phone
-}));
+                localStorage.setItem("user", JSON.stringify({
+                    username: user.username,
+                    phone: user.phone,
+                    role: user.role
+                }));
 
-window.location.href = "home.html";
+                // เช็ค role
+                if (user.role && user.role.trim() === "บรรณารักษ์") {
 
-}else{
+                    window.location.href = "m_book.html";
 
-document.getElementById("result").innerText = "Username หรือ Password ไม่ถูกต้อง";
+                } else {
 
-}
+                    window.location.href = "home.html";
 
-}catch(error){
+                }
 
-console.error(error);
-document.getElementById("result").innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+            } else {
 
-}
+                document.getElementById("result").innerText = "Username หรือ Password ไม่ถูกต้อง";
 
-});
+            }
+
+        } catch (error) {
+
+            console.error(error);
+            document.getElementById("result").innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+
+        }
+
+    });
 
 }
 
@@ -56,50 +65,53 @@ document.getElementById("result").innerText = "เกิดข้อผิดพ
 
 if (registerForm) {
 
-registerForm.addEventListener("submit", async function(e){
+    registerForm.addEventListener("submit", async function (e) {
 
-e.preventDefault();
+        e.preventDefault();
 
-const data = {
+        const data = {
 
-username: document.getElementById("username").value,
-password: document.getElementById("password").value,
-phone: document.getElementById("phone").value,
-email: document.getElementById("email").value
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value,
+            phone: document.getElementById("phone").value,
+            email: document.getElementById("email").value,
 
-};
+            // สมัครสมาชิกจะเป็นผู้ใช้
+            role: "ผู้ใช้"
 
-try{
+        };
 
-const res = await fetch("http://localhost:8000/user",{
+        try {
 
-method:"POST",
+            const res = await fetch("http://localhost:8000/user", {
 
-headers:{
-"Content-Type":"application/json"
-},
+                method: "POST",
 
-body: JSON.stringify(data)
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-});
+                body: JSON.stringify(data)
 
-await res.json();
+            });
 
-document.getElementById("result").innerText = "สมัครสมาชิกสำเร็จ";
+            await res.json();
 
-setTimeout(()=>{
+            document.getElementById("result").innerText = "สมัครสมาชิกสำเร็จ";
 
-window.location.href = "login.html";
+            setTimeout(() => {
 
-},1500);
+                window.location.href = "login.html";
 
-}catch(error){
+            }, 1500);
 
-console.error(error);
-document.getElementById("result").innerText = "สมัครสมาชิกไม่สำเร็จ";
+        } catch (error) {
 
-}
+            console.error(error);
+            document.getElementById("result").innerText = "สมัครสมาชิกไม่สำเร็จ";
 
-});
+        }
+
+    });
 
 }

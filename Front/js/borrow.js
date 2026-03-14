@@ -36,37 +36,37 @@ returnDateInput.value = return_date;
 
 
 // ยืมหนังสือ
-document.getElementById("borrowForm").addEventListener("submit", async function(e){
+document.getElementById("borrowForm").addEventListener("submit", async function (e) {
 
     e.preventDefault();
 
-    try{
+    try {
 
-        const res = await fetch(`http://localhost:8000/borrow/${book_id}`,{
+        const res = await fetch(`http://localhost:8000/borrow/${book_id}`, {
 
-            method:"PUT",
+            method: "PUT",
 
-            headers:{
-                "Content-Type":"application/json"
+            headers: {
+                "Content-Type": "application/json"
             },
 
-            body:JSON.stringify({
-                username:user.username,
-                phone:user.phone
+            body: JSON.stringify({
+                username: user.username,
+                phone: user.phone
             })
 
         });
 
         const data = await res.json();
 
-        if(res.ok){
+        if (res.ok) {
             alert("ยืมหนังสือสำเร็จ");
             window.location.href = "home.html";
-        }else{
+        } else {
             alert(data.message);
         }
 
-    }catch(error){
+    } catch (error) {
 
         console.error(error);
         alert("เกิดข้อผิดพลาด");

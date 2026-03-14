@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+
+<body>
+
+    <h2>รายการหนังสือ</h2>
+
+    <button onclick="logout()">Logout</button>
+    <button onclick="goBorrow()">การยืมหนังสือ</button>
+    <button onclick="goUser()">จัดการผู้ใช้</button>
+
+    <br><br>
+
+    <label>ชื่อหนังสือ</label>
+    <input type="text" id="searchName" onkeyup="searchBooks()">
+
+    <label>ประเภทหนังสือ</label>
+    <input type="text" id="searchType" onkeyup="searchBooks()">
+
+    <button onclick="searchBooks()">ค้นหา</button>
+    <button onclick="resetSearch()">รีเซ็ต</button>
+
+    <br><br>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ชื่อหนังสือ</th>
+                <th>ประเภท</th>
+                <th>สถานะ</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="bookTable">
+            <!-- POPUP EDIT -->
+            <div id="editPopup"
+                style="display:none; position:fixed; top:30%; left:40%; background:white; border:1px solid black; padding:20px;">
+
+                <h3>แก้ไขข้อมูลหนังสือ</h3>
+
+                <input type="hidden" id="editId">
+
+                <label>ชื่อหนังสือ</label><br>
+                <input type="text" id="editName"><br><br>
+
+                <label>ประเภท</label><br>
+                <input type="text" id="editType"><br><br>
+                <select id="editStatus" disabled></select>
+
+                <button onclick="updateBook()">บันทึก</button>
+                <button onclick="closePopup()">ยกเลิก</button>
+
+            </div>
+        </tbody>
+    </table>
+
+    <script src="../js/m_book.js"></script>
+
+    <script>
+
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+
+        function goReturn() {
+            window.location.href = "return.html";
+        }
+
+        function goBorrow() {
+            window.location.href = "m_borrow.html";
+        }
+
+        function goUser() {
+            window.location.href = "m_user.html";
+        }
+
+    </script>
+
+</body>
+
+</html>

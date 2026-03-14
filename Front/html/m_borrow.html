@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>รายการยืมหนังสือ</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 6px 12px;
+            margin: 2px;
+            cursor: pointer;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 900px;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .top-bar {
+            margin-bottom: 10px;
+        }
+
+        #editPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 1px solid #999;
+            padding: 20px;
+            width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>รายการยืมหนังสือ</h2>
+
+    <button onclick="logout()">Logout</button>
+    <button onclick="goBook()">จัดการหนังสือ</button>
+    <button onclick="goUser()">จัดการผู้ใช้</button>
+
+    <br><br>
+
+    <div class="top-bar">
+
+        <label>ชื่อหนังสือ</label>
+        <input type="text" id="searchName">
+
+        <label>ผู้ยืม</label>
+        <input type="text" id="searchUser">
+
+        <button onclick="searchBorrow()">ค้นหา</button>
+        <button onclick="resetSearch()">รีเซ็ต</button>
+
+    </div>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ชื่อหนังสือ</th>
+                <th>ผู้ยืม</th>
+                <th>วันที่ยืม</th>
+                <th>วันคืน</th>
+                <th>สถานะ</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="borrowTable"></tbody>
+
+    </table>
+
+
+    <!-- popup edit -->
+
+    <div id="editPopup">
+
+        <h3>แก้ไขสถานะ</h3>
+
+        <input type="hidden" id="editId">
+
+        <label>สถานะ</label>
+
+        <select id="editStatus">
+            <option value="ยังไม่คืน">ยังไม่คืน</option>
+            <option value="คืนแล้ว">คืนแล้ว</option>
+        </select>
+
+        <br><br>
+
+        <button onclick="updateBorrow()">บันทึก</button>
+        <button onclick="closePopup()">ยกเลิก</button>
+
+    </div>
+
+
+    <script src="../js/m_borrow.js"></script>
+
+    <script>
+
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+
+        function goBook() {
+            window.location.href = "./m_book.html";
+        }
+
+        function goUser() {
+            window.location.href = "m_user.html";
+        }
+
+
+    </script>
+
+</body>
+
+</html>

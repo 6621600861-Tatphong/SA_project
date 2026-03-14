@@ -1,51 +1,53 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-<meta charset="UTF-8">
-<title>Borrow Book</title>
+    <meta charset="UTF-8">
+    <title>Borrow Book</title>
 </head>
 
 <body>
 
-<button onclick="goBack()">ย้อนกลับ</button>
-<button onclick="logout()">Logout</button>
+    <button onclick="goBack()">ย้อนกลับ</button>
+    <button onclick="logout()">Logout</button>
 
-<h2>ยืมหนังสือ</h2>
+    <h2>ยืมหนังสือ</h2>
 
-<form id="borrowForm">
+    <form id="borrowForm">
 
-<label>Username</label>
-<input type="text" id="username" readonly>
-<br><br>
+        <label>Username</label>
+        <input type="text" id="username" readonly>
+        <br><br>
 
-<label>Phone</label>
-<input type="text" id="phone" readonly>
-<br><br>
+        <label>Phone</label>
+        <input type="text" id="phone" readonly>
+        <br><br>
 
-<label>Borrow Date</label>
-<input type="text" id="borrow_date" readonly>
-<br><br>
+        <label>Borrow Date</label>
+        <input type="text" id="borrow_date" readonly>
+        <br><br>
 
-<label>Return Date</label>
-<input type="text" id="return_date" readonly>
-<br><br>
+        <label>Return Date</label>
+        <input type="text" id="return_date" readonly>
+        <br><br>
 
-<button type="submit">ยืมหนังสือ</button>
+        <button type="submit">ยืมหนังสือ</button>
 
-</form>
+    </form>
 
-<script src="../js/borrow.js"></script>
+    <script src="../js/borrow.js"></script>
 
-<script>
-function goBack(){
-    window.location.href = "home.html";
-}
+    <script>
+        function goBack() {
+            window.location.href = "home.html";
+        }
 
-function logout(){
-    localStorage.removeItem("user");
-    window.location.href = "login.html";
-}
-</script>
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+    </script>
 
 </body>
+
 </html>

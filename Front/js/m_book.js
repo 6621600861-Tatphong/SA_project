@@ -47,27 +47,22 @@ function renderBooks(books) {
 
     const table = document.getElementById("bookTable");
 
+    if (!table) return;
+
     table.innerHTML = "";
 
     if (books.length === 0) {
+
         table.innerHTML = `
         <tr>
-        <td colspan="5">ไม่พบข้อมูลหนังสือ</td>
+            <td colspan="5">ไม่พบข้อมูลหนังสือ</td>
         </tr>
         `;
+
         return;
     }
 
     books.forEach(book => {
-
-        let btn = "";
-
-        if (book.status === "ยืมได้") {
-            btn = `<button onclick="goBorrow('${book.b_id}')">ยืม</button>`;
-        }
-        else {
-            btn = `ยืมไม่ได้ (${book.username})`;
-        }
 
         table.innerHTML += `
         <tr>
@@ -75,11 +70,107 @@ function renderBooks(books) {
             <td>${book.book_name}</td>
             <td>${book.book_type}</td>
             <td>${book.status}</td>
-            <td>${btn}</td>
+
+            <td>
+                <button onclick="editBook('${book.b_id}')">Edit</button>
+                <button onclick="deleteBook('${book.b_id}')">Delete</button>
+            </td>
         </tr>
         `;
 
     });
+
+}
+
+
+// ======================
+// ลบหนังสือ
+// ======================
+
+async function deleteBook(id) {
+
+    if (!confirm("ต้องการลบหนังสือหรือไม่")) return;
+
+    try {
+
+        await fetch(`${api}/${id}`, {
+            method: "DELETE"
+        });
+
+        loadBooks();
+
+    } catch (err) {
+
+        console.error(err);
+        alert("ลบข้อมูลไม่สำเร็จ");
+
+    }
+
+}
+
+
+// ======================
+// เปิด popup แก้ไข
+// ======================
+
+function editBook(id) {
+
+    const row = event.target.closest("tr");
+
+    const name = row.children[1].innerText;
+    const type = row.children[2].innerText;
+    const status = row.children[3].innerText;
+
+    document.getElementById("editId").value = id;
+    document.getElementById("editName").value = name;
+    document.getElementById("editType").value = type;
+    document.getElementById("editStatus").value = status;
+
+    document.getElementById("editPopup").style.display = "block";
+
+}
+
+
+// ======================
+// ปิด popup
+// ======================
+
+function closePopup() {
+
+    document.getElementById("editPopup").style.display = "none";
+
+}
+
+
+// ======================
+// update หนังสือ
+// ======================
+
+async function updateBook() {
+
+    const id = document.getElementById("editId").value;
+
+    const data = {
+
+        book_name: document.getElementById("editName").value,
+        book_type: document.getElementById("editType").value,
+
+    };
+
+    await fetch(`${api}/${id}`, {
+
+        method: "PUT",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(data)
+
+    });
+
+    closePopup();
+    loadBooks();
 
 }
 
@@ -94,18 +185,24 @@ async function searchBooks() {
     const type = document.getElementById("searchType").value;
 
     if (!name && !type) {
+
         loadBooks();
         return;
+
     }
 
     let url = searchApi + "?";
 
     if (name) {
+
         url += `book_name=${name}&`;
+
     }
 
     if (type) {
+
         url += `book_type=${type}`;
+
     }
 
     try {
@@ -115,9 +212,9 @@ async function searchBooks() {
 
         renderBooks(books);
 
-    } catch (error) {
+    } catch (err) {
 
-        console.error(error);
+        console.error(err);
         alert("ค้นหาหนังสือไม่สำเร็จ");
 
     }
@@ -135,17 +232,6 @@ function resetSearch() {
     document.getElementById("searchType").value = "";
 
     loadBooks();
-
-}
-
-
-// ======================
-// ไปหน้า borrow
-// ======================
-
-function goBorrow(id) {
-
-    window.location.href = `borrow.html?book_id=${id}`;
 
 }
 

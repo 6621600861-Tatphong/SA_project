@@ -6,6 +6,7 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.json());
 
 const port = 8000;
 
@@ -25,11 +26,18 @@ const initMySQL = async () => {
 
 //--------------- USER -------------------------------------------------------------------------------------------
 
+// ================= USER API =================
+
+
 // GET all users
 app.get('/user', async (req, res) => {
-    const results = await conn.query('SELECT * FROM user');
+
+    const results = await conn.query('SELECT * FROM `user`');
+
     res.json(results[0]);
+
 });
+
 
 // POST create user
 app.post('/user', async (req, res) => {
@@ -37,19 +45,25 @@ app.post('/user', async (req, res) => {
     let user = req.body;
 
     const sql = `
-    INSERT INTO user (username,password,phone,email)
-    VALUES (?,?,?,?)
+    INSERT INTO \`user\` (username,password,phone,email,role)
+    VALUES (?,?,?,?,?)
     `;
 
-    const results = await conn.query(sql,[
+    const results = await conn.query(sql, [
         user.username,
         user.password,
         user.phone,
-        user.email
+        user.email,
+        user.role || "ผู้ใช้"
     ]);
 
-    res.json(results[0]);
+    res.json({
+        message: "สร้างผู้ใช้สำเร็จ",
+        data: results[0]
+    });
+
 });
+
 
 // GET user by id
 app.get('/user/:id', async (req, res) => {
@@ -57,13 +71,14 @@ app.get('/user/:id', async (req, res) => {
     let id = req.params.id;
 
     const results = await conn.query(
-        'SELECT * FROM user WHERE id = ?',
+        'SELECT * FROM `user` WHERE id = ?',
         [id]
     );
 
     res.json(results[0][0]);
 
 });
+
 
 // UPDATE user
 app.put('/user/:id', async (req, res) => {
@@ -72,13 +87,17 @@ app.put('/user/:id', async (req, res) => {
     let updateUser = req.body;
 
     const results = await conn.query(
-        'UPDATE user SET ? WHERE id = ?',
-        [updateUser,id]
+        'UPDATE `user` SET ? WHERE id = ?',
+        [updateUser, id]
     );
 
-    res.json(results[0]);
+    res.json({
+        message: "แก้ไขข้อมูลผู้ใช้สำเร็จ",
+        data: results[0]
+    });
 
 });
+
 
 // DELETE user
 app.delete('/user/:id', async (req, res) => {
@@ -86,11 +105,14 @@ app.delete('/user/:id', async (req, res) => {
     let id = req.params.id;
 
     const results = await conn.query(
-        'DELETE FROM user WHERE id = ?',
+        'DELETE FROM `user` WHERE id = ?',
         [id]
     );
 
-    res.json(results[0]);
+    res.json({
+        message: "ลบผู้ใช้สำเร็จ",
+        data: results[0]
+    });
 
 });
 
@@ -100,7 +122,7 @@ app.delete('/user/:id', async (req, res) => {
 //--------------- BOOK -------------------------------------------------------------------------------------------
 
 // GET books
-app.get('/book', async (req,res)=>{
+app.get('/book', async (req, res) => {
 
     let sql = `
     SELECT 
@@ -135,7 +157,7 @@ app.get('/book', async (req,res)=>{
 });
 
 // GET book by id
-app.get('/book/:id', async (req,res)=>{
+app.get('/book/:id', async (req, res) => {
 
     let id = req.params.id;
 
@@ -149,7 +171,7 @@ app.get('/book/:id', async (req,res)=>{
 });
 
 // ADD book
-app.post('/book', async (req,res)=>{
+app.post('/book', async (req, res) => {
 
     let book = req.body;
 
@@ -158,7 +180,7 @@ app.post('/book', async (req,res)=>{
     VALUES (?,?,?,?)
     `;
 
-    const results = await conn.query(sql,[
+    const results = await conn.query(sql, [
         book.book_id,
         book.book_name,
         book.book_type,
@@ -170,22 +192,23 @@ app.post('/book', async (req,res)=>{
 });
 
 // UPDATE book
-app.put('/book/:id', async (req,res)=>{
+app.put('/book/:id', async (req, res) => {
 
     let id = req.params.id;
     let updateBook = req.body;
 
     const results = await conn.query(
         'UPDATE book SET ? WHERE b_id=?',
-        [updateBook,id]
+        [updateBook, id]
     );
 
     res.json(results[0]);
 
+
 });
 
 // DELETE book
-app.delete('/book/:id', async (req,res)=>{
+app.delete('/book/:id', async (req, res) => {
 
     let id = req.params.id;
 
@@ -199,9 +222,9 @@ app.delete('/book/:id', async (req,res)=>{
 });
 
 // SEARCH book
-app.get('/apibook/search', async (req,res)=>{
+app.get('/apibook/search', async (req, res) => {
 
-    try{
+    try {
 
         const book_name = req.query.book_name;
         const book_type = req.query.book_type;
@@ -211,33 +234,51 @@ app.get('/apibook/search', async (req,res)=>{
             book.b_id,
             book.book_name,
             book.book_type,
-            book.book_detail
+            book.book_detail,
+
+            CASE
+                WHEN borrow.status = 'ยังไม่คืน'
+                THEN 'ยืมไม่ได้'
+                ELSE 'ยืมได้'
+            END AS status,
+
+            user.username,
+            user.phone
+
         FROM book
+
+        LEFT JOIN borrow
+        ON book.b_id = borrow.book_id
+        AND borrow.status = 'ยังไม่คืน'
+
+        LEFT JOIN user
+        ON borrow.user_id = user.id
+
         WHERE 1=1
         `;
 
         let params = [];
 
-        if(book_name){
-            sql += ` AND book_name LIKE ?`;
+        if (book_name) {
+            sql += ` AND book.book_name LIKE ?`;
             params.push(`%${book_name}%`);
         }
 
-        if(book_type){
-            sql += ` AND book_type LIKE ?`;
+        if (book_type) {
+            sql += ` AND book.book_type LIKE ?`;
             params.push(`%${book_type}%`);
         }
 
-        const [rows] = await conn.query(sql,params);
+        const [rows] = await conn.query(sql, params);
 
         res.json(rows);
 
-    }catch(err){
+    } catch (err) {
 
         console.log(err);
 
         res.status(500).json({
-            message:"Search error"
+            message: "Search error"
         });
 
     }
@@ -251,7 +292,7 @@ app.get('/apibook/search', async (req,res)=>{
 
 
 // ดูรายการยืม
-app.get('/borrow', async (req,res)=>{
+app.get('/borrow', async (req, res) => {
 
     const results = await conn.query(`
         SELECT
@@ -272,7 +313,7 @@ app.get('/borrow', async (req,res)=>{
 
 
 // คืนหนังสือ
-app.put('/borrow/return/:id', async (req,res)=>{
+app.put('/borrow/return/:id', async (req, res) => {
 
     let id = req.params.id;
 
@@ -282,15 +323,15 @@ app.put('/borrow/return/:id', async (req,res)=>{
     );
 
     res.json({
-        message:"คืนหนังสือสำเร็จ",
-        data:results[0]
+        message: "คืนหนังสือสำเร็จ",
+        data: results[0]
     });
 
 });
 
 
 // ลบรายการยืม
-app.delete('/borrow/:id', async (req,res)=>{
+app.delete('/borrow/:id', async (req, res) => {
 
     let id = req.params.id;
 
@@ -300,28 +341,28 @@ app.delete('/borrow/:id', async (req,res)=>{
     );
 
     res.json({
-        message:"ลบข้อมูลสำเร็จ",
-        data:results[0]
+        message: "ลบข้อมูลสำเร็จ",
+        data: results[0]
     });
 
 });
 
-app.put('/borrow/:book_id', async (req,res)=>{
+app.put('/borrow/:book_id', async (req, res) => {
 
-    try{
+    try {
 
         let book_id = req.params.book_id;
-        let {username,phone} = req.body;
+        let { username, phone } = req.body;
 
         // หา user
         const userResult = await conn.query(
             'SELECT * FROM user WHERE username=? AND phone=?',
-            [username,phone]
+            [username, phone]
         );
 
-        if(userResult[0].length === 0){
+        if (userResult[0].length === 0) {
             return res.status(404).json({
-                message:"ไม่พบผู้ใช้"
+                message: "ไม่พบผู้ใช้"
             });
         }
 
@@ -334,9 +375,9 @@ app.put('/borrow/:book_id', async (req,res)=>{
             [book_id]
         );
 
-        if(checkBorrow[0].length > 0){
+        if (checkBorrow[0].length > 0) {
             return res.json({
-                message:"หนังสือถูกยืมอยู่"
+                message: "หนังสือถูกยืมอยู่"
             });
         }
 
@@ -346,7 +387,7 @@ app.put('/borrow/:book_id', async (req,res)=>{
 
         // วันคืน
         let return_date = new Date();
-        return_date.setDate(return_date.getDate()+7);
+        return_date.setDate(return_date.getDate() + 7);
 
 
         const sql = `
@@ -354,7 +395,7 @@ app.put('/borrow/:book_id', async (req,res)=>{
         VALUES (?,?,?,?,?)
         `;
 
-        const results = await conn.query(sql,[
+        const results = await conn.query(sql, [
             book_id,
             user_id,
             borrow_date,
@@ -363,40 +404,40 @@ app.put('/borrow/:book_id', async (req,res)=>{
         ]);
 
         res.json({
-            message:"ยืมหนังสือสำเร็จ",
-            data:results[0]
+            message: "ยืมหนังสือสำเร็จ",
+            data: results[0]
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
         res.status(500).json({
-            message:"เกิดข้อผิดพลาด"
+            message: "เกิดข้อผิดพลาด"
         });
 
     }
 
 });
 
-app.put('/borrowedit/:id', async (req,res)=>{
+app.put('/borrowedit/:id', async (req, res) => {
 
     let id = req.params.id;
     let updateBorrow = req.body;
 
     const results = await conn.query(
         'UPDATE borrow SET ? WHERE borrow_id=?',
-        [updateBorrow,id]
+        [updateBorrow, id]
     );
 
     res.json({
-        message:"แก้ไขข้อมูลยืมสำเร็จ",
-        data:results[0]
+        message: "แก้ไขข้อมูลยืมสำเร็จ",
+        data: results[0]
     });
 
 });
 
-app.delete('/borrow/:id', async (req,res)=>{
+app.delete('/borrow/:id', async (req, res) => {
 
     let id = req.params.id;
 
@@ -406,8 +447,8 @@ app.delete('/borrow/:id', async (req,res)=>{
     );
 
     res.json({
-        message:"ลบข้อมูลยืมสำเร็จ",
-        data:results[0]
+        message: "ลบข้อมูลยืมสำเร็จ",
+        data: results[0]
     });
 
 });

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>คืนหนังสือ</title>
+</head>
+
+<body>
+
+    <h2>รายการยืมหนังสือของฉัน</h2>
+
+    <button onclick="goHome()">กลับหน้าหลัก</button>
+    <button onclick="logout()">Logout</button>
+
+    <br><br>
+
+    <table border="1">
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ชื่อหนังสือ</th>
+                <th>วันยืม</th>
+                <th>กำหนดคืน</th>
+                <th>สถานะ</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="borrowTable"></tbody>
+
+    </table>
+
+    <script src="../js/return.js"></script>
+
+    <script>
+
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+
+        function goHome() {
+            window.location.href = "home.html";
+        }
+
+    </script>
+
+</body>
+
+</html>

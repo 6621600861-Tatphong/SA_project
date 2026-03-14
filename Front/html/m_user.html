@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>จัดการผู้ใช้</title>
+</head>
+
+<body>
+
+    <h2>รายการผู้ใช้</h2>
+
+    <button onclick="logout()">Logout</button>
+    <button onclick="goBook()">จัดการหนังสือ</button>
+    <button onclick="goBorrow()">การยืมหนังสือ</button>
+
+    <br><br>
+
+    <label>ชื่อผู้ใช้</label>
+    <input type="text" id="searchName" onkeyup="searchUsers()">
+
+    <label>Role</label>
+    <input type="text" id="searchRole" onkeyup="searchUsers()">
+
+    <button onclick="searchUsers()">ค้นหา</button>
+    <button onclick="resetSearch()">รีเซ็ต</button>
+
+    <br><br>
+
+    <table border="1">
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="userTable"></tbody>
+
+    </table>
+
+
+    <!-- POPUP EDIT -->
+
+    <div id="editPopup"
+        style="display:none; position:fixed; top:30%; left:40%; background:white; border:1px solid black; padding:20px;">
+
+        <h3>แก้ไขข้อมูลผู้ใช้</h3>
+
+        <input type="hidden" id="editId">
+
+        <label>Username</label><br>
+        <input type="text" id="editUsername"><br><br>
+
+        <label>Phone</label><br>
+        <input type="text" id="editPhone"><br><br>
+
+        <label>Role</label><br>
+
+        <select id="editRole">
+            <option value="ผู้ใช้">ผู้ใช้</option>
+            <option value="บรรณารักษ์">บรรณารักษ์</option>
+        </select>
+
+        <br><br>
+
+        <button onclick="updateUser()">บันทึก</button>
+        <button onclick="closePopup()">ยกเลิก</button>
+
+    </div>
+
+
+    <script src="../js/m_user.js"></script>
+
+    <script>
+
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+
+        function goBook() {
+            window.location.href = "m_book.html";
+        }
+
+        function goBorrow() {
+            window.location.href = "m_borrow.html";
+        }
+
+    </script>
+
+</body>
+
+</html>
